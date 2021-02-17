@@ -1,17 +1,16 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from "@angular/core";
 
-import { interval, Subscription, Observable } from 'rxjs';
+import { interval, Subscription, Observable } from "rxjs";
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  selector: "app-home",
+  templateUrl: "./home.component.html",
+  styleUrls: ["./home.component.css"],
 })
 export class HomeComponent implements OnInit, OnDestroy {
-
   private obserableSubscription: Subscription;
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit() {
     // just a simple custom observable
@@ -24,17 +23,32 @@ export class HomeComponent implements OnInit, OnDestroy {
       let count = 0;
       setInterval(() => {
         observer.next(count);
+        if( count === 2){
+          observer.complete();
+        }
+        if (count > 3) {
+          observer.error(new Error("Count is greater than 3!"));
+        }
         count++;
       }, 1000);
     });
 
-    this.obserableSubscription = customIntervalObservable.subscribe((data) => {
-      console.log("data: " + data);
-    });
+    this.obserableSubscription = customIntervalObservable.subscribe(
+      (data) => {
+        console.log("data: " + data);
+      },
+      (error) => {
+        console.log("error: " + error);
+        alert(error.message);
+      },
+      // complete function, does NOT get called if error is called.
+      () => {
+        console.log("Completed!");
+      }
+    );
   }
 
-  ngOnDestroy(){
+  ngOnDestroy() {
     this.obserableSubscription.unsubscribe();
   }
-
 }
