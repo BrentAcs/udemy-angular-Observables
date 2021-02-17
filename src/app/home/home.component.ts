@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 
 import { interval, Subscription, Observable } from "rxjs";
+import { map, filter } from "rxjs/operators";
 
 @Component({
   selector: "app-home",
@@ -23,7 +24,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       let count = 0;
       setInterval(() => {
         observer.next(count);
-        if( count === 2){
+        if (count === 2) {
           observer.complete();
         }
         if (count > 3) {
@@ -33,19 +34,37 @@ export class HomeComponent implements OnInit, OnDestroy {
       }, 1000);
     });
 
-    this.obserableSubscription = customIntervalObservable.subscribe(
-      (data) => {
-        console.log("data: " + data);
-      },
-      (error) => {
-        console.log("error: " + error);
-        alert(error.message);
-      },
-      // complete function, does NOT get called if error is called.
-      () => {
-        console.log("Completed!");
-      }
-    );
+    // example of pipe operator. note, data is not change for the caller.
+    // we can transform it and send the result on.
+    // customIntervalObservable.pipe(
+    //   map((data) => {
+    //     return "Round: " + data + 1;
+    //   })
+    // );
+
+    this.obserableSubscription = customIntervalObservable
+      .pipe(
+        filter((data) => {
+          // return whether or not map or subscribe get called.
+          return data > 0;
+        }),
+        map((data) => {
+          return "Round: " + (data + 1);
+        })
+      )
+      .subscribe(
+        (data) => {
+          console.log(data);
+        },
+        (error) => {
+          console.log("error: " + error);
+          alert(error.message);
+        },
+        // complete function, does NOT get called if error is called.
+        () => {
+          console.log("Completed!");
+        }
+      );
   }
 
   ngOnDestroy() {
