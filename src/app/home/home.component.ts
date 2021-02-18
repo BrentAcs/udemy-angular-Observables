@@ -49,7 +49,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           return data > 0;
         }),
         map((data) => {
-          return "Round: " + (data + 1);
+          return "Round: " + (+data + 1);
         })
       )
       .subscribe(
